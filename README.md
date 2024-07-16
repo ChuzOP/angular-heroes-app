@@ -9,6 +9,9 @@ En esta aplicación exploraremos los siguientes temas:
 2. **Rutas y Rutas Hijas**
 3. **Lazy Load**
 4. **Angular Material**
+5. **JSON Server**
+6. **Variables de Entorno**
+7. **Manejo de Peticiones**
 
 ## Layouts
 
@@ -128,3 +131,93 @@ export class AppModule {}
   <span>Heroes APP</span>
 </mat-toolbar>
 <button mat-raised-button color="accent">New Hero</button>
+```
+
+## JSON Server
+
+JSON Server es una herramienta que permite crear rápidamente un servidor RESTful simulado con una base de datos JSON. Es útil para pruebas y desarrollo local sin necesidad de configurar un servidor backend completo.
+
+### Ejemplo
+
+Para instalar y ejecutar JSON Server:
+
+```bash
+npm install -g json-server
+json-server --watch db.json
+```
+
+Donde `db.json` es un archivo que contiene los datos JSON que deseas exponer como una API.
+
+## Variables de Entorno
+
+Las variables de entorno en Angular se utilizan para almacenar valores de configuración que pueden variar entre diferentes entornos (desarrollo, producción, etc.). Estas variables se definen en archivos específicos y se acceden en el código a través del objeto `environments`.
+
+### Ejemplo
+
+En `src/environments/environment.ts`:
+
+```typescript
+export const environment = {
+  production: false,
+  baseURL: 'http://localhost:3000',
+};
+```
+
+En el servicio Angular:
+
+```typescript
+import { environments } from '../../../environments/environments';
+
+@Injectable({ providedIn: 'root' })
+export class HeroesService {
+    private baseUrl: string = environments.baseURL;
+    constructor(private http: HttpClient) {}
+}
+```
+
+## Manejo de Peticiones
+
+El manejo de peticiones en Angular se realiza comúnmente utilizando el módulo `HttpClient`. Este módulo proporciona métodos para hacer solicitudes HTTP y gestionar las respuestas.
+
+### Ejemplo
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, Observable, of } from 'rxjs';
+import { Hero } from '../interfaces/hero.interface';
+import { environments } from '../../../environments/environments';
+
+@Injectable({ providedIn: 'root' })
+export class HeroesService {
+    private baseUrl: string = environments.baseURL;
+    constructor(private http: HttpClient) {}
+
+    getHeroes(): Observable<Hero[]> {
+        return this.http.get<Hero[]>(`${this.baseUrl}/heroes`);
+    }
+
+    getHeroById(id: string): Observable<Hero | undefined> {
+        return this.http
+            .get<Hero>(`${this.baseUrl}/heroes/${id}`)
+            .pipe(catchError((error) => of(undefined)));
+    }
+}
+```
+
+### Manejo de Errores
+
+El manejo de errores en peticiones HTTP se realiza utilizando operadores como `catchError` de RxJS para capturar y gestionar errores de manera adecuada.
+
+### Ejemplo
+
+```typescript
+getHeroById(id: string): Observable<Hero | undefined> {
+    return this.http
+        .get<Hero>(`${this.baseUrl}/heroes/${id}`)
+        .pipe(catchError((error) => {
+            console.error('Error fetching hero by ID:', error);
+            return of(undefined);
+        }));
+}
+```
