@@ -12,6 +12,7 @@ En esta aplicación exploraremos los siguientes temas:
 5. **JSON Server**
 6. **Variables de Entorno**
 7. **Manejo de Peticiones**
+8. **Introducción a los Formularios reactivos**
 
 ## Layouts
 
